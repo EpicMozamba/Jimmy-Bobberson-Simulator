@@ -1,2 +1,0 @@
-# Jimmy Bobberson Simulator
- 

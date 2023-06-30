@@ -1,0 +1,154 @@
+fileFormatVersion: 2
+guid: c943dfb2b5999d74e9471ab9beacfb07
+ModelImporter:
+  serializedVersion: 21300
+  internalIDToNameTable:
+  - first:
+      74: -6759252082922200606
+    second: Lower Left Arm|Lower Left ArmAction
+  - first:
+      74: 1498292132030150502
+    second: Lower Left Arm|Lower Right ArmAction
+  - first:
+      74: -906399638199243945
+    second: Lower Left Arm|Upper Left ArmAction
+  - first:
+      74: -3821785928095200327
+    second: Lower Left Arm|Upper Right ArmAction
+  - first:
+      74: 4209497090026986726
+    second: Lower Right Arm|Lower Left ArmAction
+  - first:
+      74: -6394266811584715585
+    second: Lower Right Arm|Lower Right ArmAction
+  - first:
+      74: 614364342957590302
+    second: Lower Right Arm|Upper Left ArmAction
+  - first:
+      74: -4498342819097959274
+    second: Lower Right Arm|Upper Right ArmAction
+  - first:
+      74: -5461349048562139350
+    second: Upper Left Arm|Lower Left ArmAction
+  - first:
+      74: 4411367168205666003
+    second: Upper Left Arm|Lower Right ArmAction
+  - first:
+      74: 8648725836933302940
+    second: Upper Left Arm|Upper Left ArmAction
+  - first:
+      74: 8349697406976242687
+    second: Upper Left Arm|Upper Right ArmAction
+  - first:
+      74: 2740303213285381890
+    second: Upper Right Arm|Lower Left ArmAction
+  - first:
+      74: 8720388465452115831
+    second: Upper Right Arm|Lower Right ArmAction
+  - first:
+      74: 4604670420311745616
+    second: Upper Right Arm|Upper Left ArmAction
+  - first:
+      74: 7741401173868610580
+    second: Upper Right Arm|Upper Right ArmAction
+  externalObjects: {}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 1
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 0
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
