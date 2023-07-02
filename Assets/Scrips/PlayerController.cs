@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float baseFov = 87.5f;
     [SerializeField] private float sprintFov = 99.9f;
     [SerializeField] private float zoomTime;
-    private Coroutine fovCoroutine = null;
+    private Coroutine fovCoroutine;
 
     // Start is called before the first frame update
     void Start()
@@ -70,6 +70,11 @@ public class PlayerController : MonoBehaviour
             rb.drag = groundDrag;
         else
             rb.drag = 0;
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+            fovCoroutine = StartCoroutine(LerpFov(baseFov, sprintFov));
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+            fovCoroutine = StartCoroutine(LerpFov(sprintFov, baseFov));
 
         //Debug.Log(readyToJump);
     }
@@ -112,16 +117,12 @@ public class PlayerController : MonoBehaviour
             if (isSprinting)
             {
                 Debug.Log("sprinting");
-                if (fovCoroutine == null)
-                    fovCoroutine = StartCoroutine(LerpFov(baseFov, sprintFov));
                 rb.AddForce(moveDirection.normalized * moveSpeed * 10f * sprintModifier, ForceMode.Force);
 
             }
             else
             {
                 Debug.Log("walking");
-                if (fovCoroutine == null)
-                    fovCoroutine = StartCoroutine(LerpFov(sprintFov, baseFov));
                 rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
 
             }
@@ -148,9 +149,27 @@ public class PlayerController : MonoBehaviour
         }
         camera.fieldOfView = targetFov;
         weaponCamera.fieldOfView = targetFov;
-
-        fovCoroutine = null;
     }
+
+    //private IEnumerator LerpFov(float startFov, float targetFov)
+    //{
+    //    float currentTime = 0f;
+    //    while (currentTime < zoomTime)
+    //    {
+    //        currentTime += Time.deltaTime;
+    //        camera.fieldOfView = Mathf.Lerp(startFov, targetFov, currentTime / zoomTime);
+    //        weaponCamera.fieldOfView = Mathf.Lerp(startFov, targetFov, currentTime / zoomTime);
+    //        //Debug.Log("i love cheese and jons and i hate chiken also grande is amazing");
+    //        yield return null;
+
+    //    }
+    //    camera.fieldOfView = targetFov;
+    //    weaponCamera.fieldOfView = targetFov;
+
+    //    if (!isSprinting)
+    //        fovCoroutine = null;
+    //    else 
+    //}
 
     private void SpeedControl()
     {
