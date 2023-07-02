@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpForce;
     [SerializeField] private float jumpCooldown;
     [SerializeField] private float airMultiplier;
+    [SerializeField] private float sprintJumpVelocity;
     bool readyToJump;
 
     [Header("Keybinds")]
@@ -35,9 +36,11 @@ public class PlayerController : MonoBehaviour
 
     [Header("Camera Settings")]
     [SerializeField] private new Camera camera;
+    [SerializeField] private new Camera weaponCamera;
     [SerializeField] private float baseFov = 87.5f;
     [SerializeField] private float sprintFov = 99.9f;
     [SerializeField] private float zoomTime;
+    private Coroutine fovCoroutine = null;
 
     // Start is called before the first frame update
     void Start()
@@ -109,14 +112,16 @@ public class PlayerController : MonoBehaviour
             if (isSprinting)
             {
                 Debug.Log("sprinting");
-                StartCoroutine(LerpFov(baseFov, sprintFov));
+                if (fovCoroutine == null)
+                    fovCoroutine = StartCoroutine(LerpFov(baseFov, sprintFov));
                 rb.AddForce(moveDirection.normalized * moveSpeed * 10f * sprintModifier, ForceMode.Force);
 
             }
             else
             {
                 Debug.Log("walking");
-                StartCoroutine(LerpFov(sprintFov, baseFov));
+                if (fovCoroutine == null)
+                    fovCoroutine = StartCoroutine(LerpFov(sprintFov, baseFov));
                 rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
 
             }
@@ -136,11 +141,15 @@ public class PlayerController : MonoBehaviour
         {
             currentTime += Time.deltaTime;
             camera.fieldOfView = Mathf.Lerp(startFov, targetFov, currentTime / zoomTime);
+            weaponCamera.fieldOfView = Mathf.Lerp(startFov, targetFov, currentTime / zoomTime);
             //Debug.Log("i love cheese and jons and i hate chiken also grande is amazing");
             yield return null;
 
         }
         camera.fieldOfView = targetFov;
+        weaponCamera.fieldOfView = targetFov;
+
+        fovCoroutine = null;
     }
 
     private void SpeedControl()
@@ -151,6 +160,12 @@ public class PlayerController : MonoBehaviour
         if (flatVel.magnitude > moveSpeed && !Input.GetKey(KeyCode.LeftShift))
         {
             Vector3 limitedVel = flatVel.normalized * moveSpeed;
+            rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
+        }
+        //allows sprint jumping to be better than walk jumping but prevents full on bhopping using sprintJumpVelocity
+        else if (flatVel.magnitude > moveSpeed && Input.GetKey(KeyCode.LeftShift) && !grounded)
+        {
+            Vector3 limitedVel = flatVel.normalized * moveSpeed * sprintJumpVelocity;
             rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
         }
     }
