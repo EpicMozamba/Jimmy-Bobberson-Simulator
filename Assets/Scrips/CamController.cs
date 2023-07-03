@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using UnityEngine;
 
 public class CamController : MonoBehaviour
@@ -21,8 +17,8 @@ public class CamController : MonoBehaviour
     void Start()
     {
         //center mouse
-      Cursor.lockState = CursorLockMode.Locked;
-      Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
 
     }
 

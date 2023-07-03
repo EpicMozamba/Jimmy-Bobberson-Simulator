@@ -7,10 +7,12 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed;
     [SerializeField] private float sprintModifier;
+    [SerializeField] private float backwardsMovementModifier;
     private bool isSprinting;
+    private bool isMoving;
 
     [SerializeField] private float groundDrag;
-
+    [Header("Jumping")]
     [SerializeField] private float jumpForce;
     [SerializeField] private float jumpCooldown;
     [SerializeField] private float airMultiplier;
@@ -19,6 +21,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
+    public KeyCode sprintKey = KeyCode.LeftShift;
 
     [Header("Ground Check")]
     [SerializeField] private float playerHeight;
@@ -34,9 +37,11 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody rb;
 
+    private Animator animator;
+
     [Header("Camera Settings")]
     [SerializeField] private new Camera camera;
-    [SerializeField] private new Camera weaponCamera;
+    [SerializeField] private Camera weaponCamera;
     [SerializeField] private float baseFov = 87.5f;
     [SerializeField] private float sprintFov = 99.9f;
     [SerializeField] private float zoomTime;
@@ -45,6 +50,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        animator = GameObject.Find("Arms").GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
         readyToJump = true;
@@ -59,6 +65,14 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (horizontalInput == 0f && verticalInput == 0f)
+            isMoving = true;
+        else
+            isMoving = false;
+
+        Animate();
+
+
         //ground check
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, ground);
 
@@ -71,9 +85,9 @@ public class PlayerController : MonoBehaviour
         else
             rb.drag = 0;
 
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        if (Input.GetKeyDown(sprintKey) && Input.GetKey(KeyCode.W))
             fovCoroutine = StartCoroutine(LerpFov(baseFov, sprintFov));
-        if (Input.GetKeyUp(KeyCode.LeftShift))
+        if (Input.GetKeyUp(sprintKey) && Input.GetKey(KeyCode.W))
             fovCoroutine = StartCoroutine(LerpFov(sprintFov, baseFov));
 
         //Debug.Log(readyToJump);
@@ -87,6 +101,44 @@ public class PlayerController : MonoBehaviour
     {
         Gizmos.DrawLine(transform.position, transform.position - new Vector3(0f, playerHeight * 0.5f + 0.2f));
     } */
+
+    private void Animate()
+    {
+
+        if (grounded)
+        {
+            if (!isMoving)
+            {
+                StopAnimating();
+                animator.SetBool("isIdle", true);
+            }
+
+            if (isMoving && !isSprinting)
+            {
+                StopAnimating();
+                animator.SetBool("isWalking", true);
+            }
+
+            if (isMoving && isSprinting)
+            {
+                StopAnimating();
+                animator.SetBool("isSprinting", true);
+            }
+
+
+        }
+    }
+
+    private void StopAnimating()
+    {
+        animator.SetBool("isIdle", false);
+        animator.SetBool("isWalking", false);
+        animator.SetBool("isRunning", false);
+        animator.SetBool("isJumping", false);
+        animator.SetBool("isFalling", false);
+        animator.SetBool("isLanding", false);
+
+    }
 
     private void MyInput()
     {
@@ -110,20 +162,31 @@ public class PlayerController : MonoBehaviour
     {
         moveDirection = (orientation.forward * verticalInput + (orientation.right * horizontalInput * 0.8f));
 
+
         //when grounded
-        isSprinting = Input.GetKey(KeyCode.LeftShift);
+        //&& !Input.GetMouseButton(1)
+        if (Input.GetKey(sprintKey) && Input.GetKey(KeyCode.W))
+            isSprinting = true;
+        else
+            isSprinting = false;
         if (grounded)
         {
             if (isSprinting)
             {
-                Debug.Log("sprinting");
                 rb.AddForce(moveDirection.normalized * moveSpeed * 10f * sprintModifier, ForceMode.Force);
 
             }
             else
             {
-                Debug.Log("walking");
-                rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+                if (Input.GetKey(KeyCode.S))
+                {
+                    rb.AddForce(moveDirection.normalized * moveSpeed * 10f * backwardsMovementModifier, ForceMode.Force);
+                }
+                else
+                {
+                    rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+                }
+
 
             }
 
@@ -176,13 +239,13 @@ public class PlayerController : MonoBehaviour
         Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
         //limit velocidad when needed (character actual movement speed can exceed set speed)
-        if (flatVel.magnitude > moveSpeed && !Input.GetKey(KeyCode.LeftShift))
+        if (flatVel.magnitude > moveSpeed && !Input.GetKey(sprintKey))
         {
             Vector3 limitedVel = flatVel.normalized * moveSpeed;
             rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
         }
         //allows sprint jumping to be better than walk jumping but prevents full on bhopping using sprintJumpVelocity
-        else if (flatVel.magnitude > moveSpeed && Input.GetKey(KeyCode.LeftShift) && !grounded)
+        else if (flatVel.magnitude > moveSpeed && Input.GetKey(sprintKey) && !grounded)
         {
             Vector3 limitedVel = flatVel.normalized * moveSpeed * sprintJumpVelocity;
             rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
@@ -195,10 +258,15 @@ public class PlayerController : MonoBehaviour
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+
+        //animator.Play("PistolWalk");
     }
 
     private void ResetJump()
     {
         readyToJump = true;
     }
+
 }
+
+
