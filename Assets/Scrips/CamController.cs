@@ -3,6 +3,7 @@ using UnityEngine;
 public class CamController : MonoBehaviour
 {
 
+    [Header("General")]
     [SerializeField] private float sensX;
     [SerializeField] private float sensY;
 
@@ -12,6 +13,8 @@ public class CamController : MonoBehaviour
     private float yRotation;
 
     [SerializeField] private Transform cameraPosition;
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -39,5 +42,7 @@ public class CamController : MonoBehaviour
 
         //hold position on player using the CameraPosition object transform
         transform.position = cameraPosition.position;
+
     }
+
 }

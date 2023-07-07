@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float playerHeight;
     [SerializeField] private LayerMask ground;
     private bool grounded;
+    private bool inAir;
 
     [SerializeField] private Transform orientation;
 
@@ -42,22 +43,25 @@ public class PlayerController : MonoBehaviour
     [Header("Camera Settings")]
     [SerializeField] private new Camera camera;
     [SerializeField] private Camera weaponCamera;
-    [SerializeField] private float baseFov = 87.5f;
-    [SerializeField] private float sprintFov = 99.9f;
+    [SerializeField] private float baseFov = 62f;
+    [SerializeField] private float sprintFov = 80f;
     [SerializeField] private float zoomTime;
     private Coroutine fovCoroutine;
+
+    [Header("Gun")]
+    [SerializeField] private Gun gun;
 
     // Start is called before the first frame update
     void Start()
     {
-        animator = GameObject.Find("Arms").GetComponent<Animator>();
+        animator = GameObject.Find("PistolArms").GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
         readyToJump = true;
 
         //needed when camera is not serialized(public) to automatically set it, only works when u have 1 camera in the scene
         //camera = FindObjectOfType<Camera>();
-        camera.fieldOfView = 87.5f;
+        camera.fieldOfView = 60f;
 
     }
 
@@ -65,10 +69,6 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (horizontalInput == 0f && verticalInput == 0f)
-            isMoving = true;
-        else
-            isMoving = false;
 
         Animate();
 
@@ -79,7 +79,6 @@ public class PlayerController : MonoBehaviour
         MyInput();
         SpeedControl();
 
-        //Debug.Log(grounded);
         if (grounded)
             rb.drag = groundDrag;
         else
@@ -87,44 +86,76 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(sprintKey) && Input.GetKey(KeyCode.W))
             fovCoroutine = StartCoroutine(LerpFov(baseFov, sprintFov));
-        if (Input.GetKeyUp(sprintKey) && Input.GetKey(KeyCode.W))
+        if (Input.GetKeyUp(sprintKey) && Input.GetKey(KeyCode.W) && grounded)
             fovCoroutine = StartCoroutine(LerpFov(sprintFov, baseFov));
+        //if (grounded && !Input.GetKey(sprintKey))
+        //    fovCoroutine = StartCoroutine(LerpFov(sprintFov, baseFov));
 
         //Debug.Log(readyToJump);
+        //check for movement, used for animations
+        if (horizontalInput == 0f && verticalInput == 0f)
+            isMoving = false;
+        else
+            isMoving = true;
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            StopAnimating();
+            //animator.Play("PistolEquip");
+            animator.SetBool("isEquipping", true);
+        }
+        if (Input.GetMouseButtonDown(0))
+        {
+            OnShoot();
+        }
+
+
     }
     private void FixedUpdate()
     {
         MovePlayer();
     }
 
-    /*private void OnDrawGizmos()
+    private void OnDrawGizmos()
     {
         Gizmos.DrawLine(transform.position, transform.position - new Vector3(0f, playerHeight * 0.5f + 0.2f));
-    } */
+    }
 
     private void Animate()
     {
 
         if (grounded)
         {
-            if (!isMoving)
-            {
-                StopAnimating();
-                animator.SetBool("isIdle", true);
-            }
+            if (Input.GetKeyDown(jumpKey))
+                animator.SetBool("isJumping", true);
+        }
+        if (!grounded)
+        {
+            animator.SetBool("isFalling", true);
+            inAir = true;
+        }
 
-            if (isMoving && !isSprinting)
-            {
-                StopAnimating();
-                animator.SetBool("isWalking", true);
-            }
+    }
 
-            if (isMoving && isSprinting)
-            {
-                StopAnimating();
-                animator.SetBool("isSprinting", true);
-            }
 
+    private void LandCheck()
+    {
+        if (grounded && inAir)
+        {
+            StopAnimating();
+            animator.SetBool("isLanding", true);
+            //animator.Play("PistolFalling");
+            inAir = false;
+
+            //if (!isMoving)
+            //{
+            //    StopAnimating();
+            //    animator.SetBool("isIdle", true);
+            //}
+            //if (isMoving && !Input.GetKey(sprintKey))
+            //    animator.SetBool("isWalking", true);
+            //if (isMoving && Input.GetKey(sprintKey))
+            //    animator.SetBool("isRunning", true);
 
         }
     }
@@ -144,6 +175,7 @@ public class PlayerController : MonoBehaviour
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
+        LandCheck();
 
         //undo
         //when to jump
@@ -152,7 +184,6 @@ public class PlayerController : MonoBehaviour
             readyToJump = false;
 
             Jump();
-
             Invoke(nameof(ResetJump), jumpCooldown);
         }
     }
@@ -162,13 +193,23 @@ public class PlayerController : MonoBehaviour
     {
         moveDirection = (orientation.forward * verticalInput + (orientation.right * horizontalInput * 0.8f));
 
-
         //when grounded
         //&& !Input.GetMouseButton(1)
         if (Input.GetKey(sprintKey) && Input.GetKey(KeyCode.W))
+        {
             isSprinting = true;
-        else
+            animator.SetBool("isRunning", true);
+
+        }
+        else if (isMoving && !Input.GetKey(sprintKey) && grounded)
+        {
             isSprinting = false;
+            animator.SetBool("isWalking", true);
+            animator.SetBool("isRunning", false);
+        }
+        else
+            StopAnimating();
+
         if (grounded)
         {
             if (isSprinting)
@@ -254,17 +295,25 @@ public class PlayerController : MonoBehaviour
 
     private void Jump()
     {
-        //rest y velocity
+
+
+        //reset y velocity
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
 
-        //animator.Play("PistolWalk");
+
     }
 
     private void ResetJump()
     {
         readyToJump = true;
+
+    }
+
+    public void OnShoot()
+    {
+        gun.Shoot();
     }
 
 }
